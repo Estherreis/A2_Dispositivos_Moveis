@@ -1,6 +1,6 @@
 # Trabalho A2 – Dispositivos Móveis II
 
-**Professor:** Esther Mota e Kauê Glória  
+**Alunos:** Esther Mota e Kauê Glória  
 
 **Usuários do sistema:**
 
