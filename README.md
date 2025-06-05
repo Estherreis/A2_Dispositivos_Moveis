@@ -1,15 +1,10 @@
-# Universidade Estadual do Tocantins
-**Disciplina:** Desenvolvimento Mobile  
-**Professor:** Jocivan  
+# Trabalho A2 – Dispositivos Móveis II
 
-## 📌 Trabalho A2 – Aplicativo Mobile Acadêmico
-**Alunos:** Esther Mota e Kaue Gloria
----
+**Professor:** Esther Mota e Kauê Glória  
 
-> Usuários do sistema:
-> 
-> email: carlos@unitins.br
-> senha: pass1234
-> 
-> email: joao@unitins.br
-> senha: 123456
+**Usuários do sistema:**
+email: carlos@unitins.br
+senha: pass1234
+
+email: joao@unitins.br
+senha: 123456
