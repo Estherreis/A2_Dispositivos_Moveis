@@ -105,93 +105,212 @@ class DashboardPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue.shade900,
-        title: const Text('Secretaria', style: TextStyle(color: Colors.white)),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Center(
-              child: Text(
-                alunoNome,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: const Color(0xFFF8F8F8),
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          shape: const Border(
+            bottom: BorderSide(color: Color(0xFFE7E7E7), width: 1),
           ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: cards.map((card) {
-              return SizedBox(
-                width: 280,
-                height: 190,
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: Colors.blue.shade900,
-                          width: 6,
-                        ),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          card['titulo'] as String,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: Text(
-                            card['descricao'] as String,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: OutlinedButton(
-                            onPressed: card['action'] as VoidCallback,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.blue.shade900,
-                              side: BorderSide(color: Colors.blue.shade900),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                            ),
-                            child: const Text('Acessar'),
-                          ),
-                        ),
-                      ],
-                    ),
+          title: Row(
+            children: [
+              SizedBox(
+                height: 80,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/unitins_logo.png',
+                    height: 60,
+                    fit: BoxFit.contain,
                   ),
                 ),
-              );
-            }).toList(),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Container()),
+            ],
           ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.account_circle, color: Color(0xFF777777), size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      alunoNome,
+                      style: const TextStyle(color: Color(0xFF777777)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'logout') {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: const [
+                      Icon(Icons.logout, color: Color(0xFF094AB2)), // ícone "fa-sign-out"
+                      SizedBox(width: 8),
+                      Text('Sair'),
+                    ],
+                  ),
+                ),
+              ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: const [
+                    SizedBox(width: 4),
+                    Icon(Icons.arrow_drop_down, color: Color(0xFF777777)),
+                  ],
+                ),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+
+      body: DefaultTabController(
+        length: 1,
+        child: Column(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFFDDDDDD)),
+                ),
+              ),
+              child: Container(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFFDDDDDD)),
+                  ),
+                ),
+                alignment: Alignment.centerLeft,
+                child: const TabBar(
+                  isScrollable: true,
+                  labelColor: Color(0xFF094AB2),
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Color(0xFFDDDDDD),
+                  indicatorWeight: 1.5,
+                  tabs: [
+                    Tab(text: 'Portal do Aluno'),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.white,
+                child: TabBarView(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: [
+                            // aqui você copia o .map dos cards normalmente
+                            ...cards.where((card) => card['titulo'] != 'GRADE CURRICULAR').map((card) {
+                              return SizedBox(
+                                width: 280,
+                                height: 190,
+                                child: Card(
+                                  color: Colors.white,
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // borda azul esquerda
+                                      Positioned(
+                                        left: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        child: Container(
+                                          width: 10,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFF314BB1),
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(12),
+                                              bottomLeft: Radius.circular(12),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // conteúdo do card
+                                      Padding(
+                                        padding: const EdgeInsets.all(16),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              card['titulo'] as String,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF094AB2),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Expanded(
+                                              child: Text(
+                                                card['descricao'] as String,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                    color: Color(0xFF707070)
+                                                ),
+                                              ),
+                                            ),
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: OutlinedButton(
+                                                onPressed: card['action'] as VoidCallback,
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: const Color(0xFF005DFF), // cor da letra
+                                                  side: const BorderSide(color: Color(0xFFD5D5D5)), // borda
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(4), // menos arredondado
+                                                  ),
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
+                                                  ),
+                                                ),
+                                                child: const Text('Acessar'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ),
+          ],
         ),
       ),
     );
