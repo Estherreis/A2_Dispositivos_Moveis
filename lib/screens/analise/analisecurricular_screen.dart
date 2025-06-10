@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../models/disciplina.dart';
 import '../../services/disciplina_service.dart';
@@ -24,36 +25,49 @@ class AnaliseCurricularScreen extends StatefulWidget {
 
 class _AnaliseCurricularScreenState extends State<AnaliseCurricularScreen> {
   late Future<List<Disciplina>> futureDisciplinas;
-  String? periodoSelecionado;
-  List<String> periodosDisponiveis = [];
 
   @override
   void initState() {
     super.initState();
     futureDisciplinas = DisciplinaService.getDisciplinasByAluno(widget.alunoId);
-    futureDisciplinas.then((disciplinas) {
-      final periodos = disciplinas.map((d) => d.periodo).toSet().toList();
-      periodos.sort();
-      setState(() {
-        periodosDisponiveis = periodos.whereType<String>().toList();
-        if (periodosDisponiveis.isNotEmpty) {
-          periodoSelecionado = periodosDisponiveis.first;
-        }
-      });
-    });
+  }
+
+  String gerarCpfFake() {
+    final rand = Random();
+    String digitos(int qtd) =>
+        List.generate(qtd, (_) => rand.nextInt(10).toString()).join();
+    return '${digitos(3)}.${digitos(3)}.${digitos(3)}-${digitos(2)}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Análise Curricular', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue.shade900,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Volta para a tela anterior
-          },
+      backgroundColor: Colors.white, // fundo branco
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: const Color(0xFFF8F8F8),
+          elevation: 0,
+          automaticallyImplyLeading: true,
+          shape: const Border(
+            bottom: BorderSide(color: Color(0xFFE7E7E7), width: 1),
+          ),
+          title: Row(
+            children: [
+              SizedBox(
+                height: 60,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/unitins_logo.png',
+                    height: 48,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(child: SizedBox()),
+            ],
+          ),
         ),
       ),
       body: FutureBuilder<List<Disciplina>>(
@@ -67,82 +81,85 @@ class _AnaliseCurricularScreenState extends State<AnaliseCurricularScreen> {
             return Center(child: Text('Erro: ${snapshot.error}'));
           }
 
-          final todasDisciplinas = snapshot.data ?? [];
+          final disciplinas = snapshot.data ?? [];
 
-          // Filtra as disciplinas do período selecionado
-          final disciplinasFiltradas = periodoSelecionado == null
-              ? []
-              : todasDisciplinas.where((d) => d.periodo == periodoSelecionado).toList();
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Faixa azul
+                      Container(
+                        width: double.infinity,
+                        color: const Color(0xFF094AB2),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: const Text(
+                          'SISTEMAS DE INFORMAÇÃO',
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Text(
-                      'Selecione o Período:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 12),
-                    DropdownButton<String>(
-                      value: periodoSelecionado,
-                      items: periodosDisponiveis
-                          .map((p) => DropdownMenuItem(
-                        value: p,
-                        child: Text('$pº Período'),
-                      ))
-                          .toList(),
-                      onChanged: (novoPeriodo) {
-                        setState(() {
-                          periodoSelecionado = novoPeriodo;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: disciplinasFiltradas.isEmpty
-                    ? const Center(child: Text('Nenhuma disciplina para este período.'))
-                    : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Código')),
-                      DataColumn(label: Text('Disciplina')),
-                      DataColumn(label: Text('Faltas')),
-                      DataColumn(label: Text('A1')),
-                      DataColumn(label: Text('A2')),
-                      DataColumn(label: Text('Exame Final')),
-                      DataColumn(label: Text('Média Final')),
-                      DataColumn(label: Text('Situação')),
-                    ],
-                    rows: disciplinasFiltradas.map((disc) {
-                      Color statusColor = disc.status == 'Aprovado' ? Colors.green : Colors.amber;
-                      String statusText = disc.status == 'Aprovado' ? 'Aprovado' : 'Em Andamento';
-
-                      return DataRow(cells: [
-                        DataCell(Text(disc.codigo ?? '-')),
-                        DataCell(Text(disc.nome ?? '-')),
-                        DataCell(Text('${disc.faltas ?? '-'}')),
-                        DataCell(Text('${disc.a1 ?? '-'}')),
-                        DataCell(Text('${disc.a2 ?? '-'}')),
-                        DataCell(Text('${disc.exameFinal ?? '-'}')),
-                        DataCell(Text('${disc.mediaFinal ?? '-'}')),
-                        DataCell(
-                          Text(
-                            statusText,
-                            style: TextStyle(color: statusColor),
+                      // H1
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+                        child: Text(
+                          'Análise Curricular',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF666666),
                           ),
                         ),
-                      ]);
-                    }).toList(),
+                      ),
+
+                      // Tabela centralizada com borda azul
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFF094AB2), width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DataTable(
+                            headingRowColor: MaterialStateProperty.all(const Color(0xFF094AB2)),
+                            headingTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            dataTextStyle: const TextStyle(
+                              color: Color(0xFF094AB2), // texto das células
+                              fontSize: 14,
+                            ),
+                            columns: const [
+                              DataColumn(label: Text('Matrícula')),
+                              DataColumn(label: Text('CPF')),
+                              DataColumn(label: Text('Nome')),
+                              DataColumn(label: Text('Curso')),
+                              DataColumn(label: Text('Modalidade')),
+                              DataColumn(label: Text('Status')),
+                            ],
+                            rows: [
+                              DataRow(cells: [
+                                DataCell(Text(widget.numeroMatricula)),
+                                DataCell(Text(gerarCpfFake())),
+                                DataCell(Text(widget.alunoNome)),
+                                const DataCell(Text('Sistemas de Informação')),
+                                const DataCell(Text('Câmpus Palmas')),
+                                const DataCell(Text('Matriculado')),
+                              ])
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           );
         },
       ),

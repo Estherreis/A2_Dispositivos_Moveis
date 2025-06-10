@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as pw; // pacote para gerar PDF
-import 'package:printing/printing.dart'; // para mostrar/baixar o pdf
-import '../../models/disciplina.dart';
-import '../../services/disciplina_service.dart'; // criaremos método para enviar
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class RematriculaScreen extends StatefulWidget {
   final String alunoId;
@@ -15,78 +13,31 @@ class RematriculaScreen extends StatefulWidget {
 }
 
 class _RematriculaScreenState extends State<RematriculaScreen> {
-  late Future<List<Disciplina>> futureDisciplinas;
-  Map<String, bool> selecionadas = {};
-  final int periodoRematricula = 3; // exemplo fixo para período 3
+  String? cursoSelecionado = 'SISTEMAS DE INFORMAÇÃO/CÂMPUS PALMAS (Matriculado)';
 
-  @override
-  void initState() {
-    super.initState();
-    futureDisciplinas = DisciplinaService.getDisciplinasPorPeriodo(widget.alunoId, periodoRematricula);
-  }
-
-  void toggleSelecionada(String codigo) {
-    setState(() {
-      selecionadas[codigo] = !(selecionadas[codigo] ?? false);
-    });
-  }
-
-  Future<void> gerarEExibirPdf(List<Disciplina> disciplinas, String alunoNome) async {
+  Future<void> gerarEExibirPdf(String alunoNome) async {
     final pdf = pw.Document();
 
     pdf.addPage(
       pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Título do PDF
-            pw.Center(
-              child: pw.Text(
-                'Rematrícula - Período $periodoRematricula',
+        build: (context) => pw.Padding(
+          padding: const pw.EdgeInsets.all(32),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Rematrícula Confirmada',
                 style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
               ),
-            ),
-            pw.SizedBox(height: 20),
-
-            // Detalhes do aluno
-            pw.Text(
-              'Aluno: $alunoNome',
-              style: pw.TextStyle(fontSize: 18),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Text(
-              'Curso: Sistemas de Informação', // Substitua pelo nome do curso do aluno
-              style: pw.TextStyle(fontSize: 18),
-            ),
-            pw.SizedBox(height: 20),
-
-            // Disciplinas selecionadas
-            pw.Text(
-              'Disciplinas selecionadas:',
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 10),
-
-            // Lista de disciplinas selecionadas
-            pw.ListView.builder(
-              itemCount: disciplinas.length,
-              itemBuilder: (context, index) {
-                final disc = disciplinas[index];
-                return pw.Padding(
-                  padding: const pw.EdgeInsets.only(bottom: 8),
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text(
-                        '${disc.codigo} - ${disc.nome}',
-                        style: pw.TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+              pw.SizedBox(height: 24),
+              pw.Text('Prezado(a) aluno(a),', style: pw.TextStyle(fontSize: 16)),
+              pw.SizedBox(height: 12),
+              pw.Text(
+                'Sua rematrícula está confirmada para o curso SISTEMAS DE INFORMAÇÃO.',
+                style: pw.TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -97,62 +48,110 @@ class _RematriculaScreenState extends State<RematriculaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rematrícula Online' , style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue.shade900,
-      ),
-      body: FutureBuilder<List<Disciplina>>(
-        future: futureDisciplinas,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          final disciplinas = snapshot.data ?? [];
-
-          if (disciplinas.isEmpty) {
-            return const Center(child: Text('Nenhuma disciplina disponível para rematrícula.'));
-          }
-
-          return Column(
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: AppBar(
+          backgroundColor: const Color(0xFFF8F8F8),
+          elevation: 0,
+          automaticallyImplyLeading: true,
+          shape: const Border(
+            bottom: BorderSide(color: Color(0xFFE7E7E7), width: 1),
+          ),
+          title: Row(
             children: [
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: disciplinas.map((disc) {
-                    return CheckboxListTile(
-                      title: Text('${disc.codigo} - ${disc.nome}'),
-                      value: selecionadas[disc.codigo] ?? false,
-                      onChanged: (_) => toggleSelecionada(disc.codigo ?? ''),
-                    );
-                  }).toList(),
+              SizedBox(
+                height: 60,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/unitins_logo.png',
+                    height: 48,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton(
+              const SizedBox(width: 12),
+              const Expanded(child: SizedBox()),
+            ],
+          ),
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            color: const Color(0xFF094AB2),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: const Text(
+              'SISTEMAS DE INFORMAÇÃO',
+              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 24, 16, 4),
+            child: Text(
+              'Curso',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF094AB2),
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Text(
+              'Selecione o Curso',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF094AB2),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: RadioListTile<String>(
+              title: const Text('SISTEMAS DE INFORMAÇÃO/CÂMPUS PALMAS (Matriculado)'),
+              value: 'SISTEMAS DE INFORMAÇÃO/CÂMPUS PALMAS (Matriculado)',
+              groupValue: cursoSelecionado,
+              onChanged: (value) {
+                setState(() {
+                  cursoSelecionado = value;
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 12, 16, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
                   onPressed: () async {
-                    final selecionadasList = disciplinas.where((disc) => selecionadas[disc.codigo] == true).toList();
-
-                    if (selecionadasList.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Selecione ao menos uma disciplina.')),
-                      );
-                      return;
-                    }
-
-                    await gerarEExibirPdf(selecionadasList, widget.alunoNome);
+                    await gerarEExibirPdf(widget.alunoNome);
                     Navigator.pop(context);
                   },
-                  child: const Text('Confirmar Rematrícula'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF094AB2),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      side: const BorderSide(color: Color(0xFF00378E)),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  ),
+                  child: const Text('Próximo'),
                 ),
-              )
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
