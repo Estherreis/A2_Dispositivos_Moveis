@@ -154,7 +154,7 @@ class _BoletimScreenState extends State<BoletimScreen> {
                     ),
                     const SizedBox(width: 12),
                     DropdownButton<String>(
-                      dropdownColor: Colors.white,
+                      dropdownColor: Color(0xFF094AB2),
                       value: periodoSelecionado,
                       style: const TextStyle(color: Colors.white),
                       items: periodosDisponiveis

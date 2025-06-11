@@ -106,7 +106,7 @@ class DashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(70),
         child: AppBar(
           backgroundColor: const Color(0xFFF8F8F8),
           elevation: 0,
